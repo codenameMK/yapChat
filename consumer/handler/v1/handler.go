@@ -39,7 +39,7 @@ func Init() {
 		"group.id":          groupID,
 		"security.protocol": "SSL",
 		"ssl.ca.location":   caCertPath,
-		"auto.offset.reset": "earliest", // Start consuming from the earliest message if no offsets are present
+		"auto.offset.reset": "latest", // Start consuming from the earliest message if no offsets are present
 	}
 
 	// Create a new Kafka consumer
