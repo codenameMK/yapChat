@@ -19,7 +19,7 @@ const (
 func (c *KafkaConsumer)Init(){
 	config := &kafka.ConfigMap{
 		"bootstrap.servers": brokerList,
-		"group.id":          c.UserID,
+		"group.id":          "hello",
 		"auto.offset.reset": "latest",
 		"security.protocol": "SSL",
 		"ssl.ca.location":   caCertPath,
