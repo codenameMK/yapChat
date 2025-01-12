@@ -2,8 +2,9 @@ package main
 
 import (
 	"fmt"
-	producerHandlerv1 "yap-chat/producer/handler/v1"
+	"sync"
 	consumerHandlerv1 "yap-chat/consumer/handler/v1"
+	producerHandlerv1 "yap-chat/producer/handler/v1"
 )
 
 func main() {
@@ -15,4 +16,8 @@ func main() {
 		UserID: userId,
 	}
 	consumerHandler.Init()
+
+	var wg sync.WaitGroup
+	wg.Add(1) // Add a WaitGroup to block the main function
+	wg.Wait()
 }
