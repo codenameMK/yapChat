@@ -1,33 +1,68 @@
 package v1
 
 import (
+	"bufio"
+	"fmt"
 	"log"
-	_HttpServer "yap-chat/producer/v1"
+	"os"
+
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 )
 
-const (
-	brokerList = "b-2.mskkafkacluster.gre9l6.c3.kafka.ap-south-1.amazonaws.com:9094,b-1.mskkafkacluster.gre9l6.c3.kafka.ap-south-1.amazonaws.com:9094" // Use port 9094 for TLS
-	topic      = "comments"
-	caCertPath = "producer/resources/AmazonRootCA1.pem" // Replace with the actual path to the CA certificate
-)
+type ProducerStruct struct {
+	BrokerList  string
+	ClientId    string
+	SSLProtocol string
+	SSLPath     string
+	Topic       string
+}
 
-func Init(){
+func (po *ProducerStruct) Init() {
 	config := &kafka.ConfigMap{
-		"bootstrap.servers": brokerList,
-		"client.id":         "go-producer",
-		"security.protocol": "SSL",
-		"ssl.ca.location":   caCertPath,
+		"bootstrap.servers": po.BrokerList,
+		"client.id":         po.ClientId,
+		"security.protocol": po.SSLProtocol,
+		"ssl.ca.location":   po.SSLPath,
 	}
 	producer, err := kafka.NewProducer(config)
 	if err != nil {
 		log.Fatalf("Failed to create producer: %s", err)
 	}
 	defer producer.Close()
-	server := _HttpServer.HttpServer{
-		Producer: producer,
-		Topic:    "comments",
+	StartServer(producer, &po.Topic)
+}
+
+func StartServer(producer *kafka.Producer, topic *string) {
+
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Println("Enter messages to publish to the Kafka topic (type 'exit' to quit):")
+
+	for {
+		// Read input from terminal
+		fmt.Print("> ")
+		text, err := reader.ReadString('\n')
+		if err != nil {
+			log.Printf("Error reading input: %v\n", err)
+			continue
+		}
+
+		// Trim whitespace and check for exit command
+		text = text[:len(text)-1] // Remove the newline character
+		if text == "exit" {
+			break
+		}
+
+		// Produce the message to the Kafka topic
+		err = producer.Produce(&kafka.Message{
+			TopicPartition: kafka.TopicPartition{Topic: topic, Partition: kafka.PartitionAny},
+			Value:          []byte(text),
+		}, nil)
+
+		if err != nil {
+			log.Printf("Failed to produce message: %v\n", err)
+		} else {
+			log.Printf("Message '%s' queued for delivery\n", text)
+		}
 	}
-	server.StartServer()
 
 }
