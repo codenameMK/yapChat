@@ -59,9 +59,9 @@ func StartServer(producer *kafka.Producer, topic *string) {
 		}, nil)
 
 		if err != nil {
-			fmt.Printf("Failed to produce message: %v\n", err)
+			fmt.Println("Failed to produce message: %v\n", err)
 		} else {
-			fmt.Printf(time.Now().Format("2006-01-02 15:04:05"))
+			fmt.Println(time.Now().Format("2006-01-02 15:04:05"))
 		}
 	}
 
