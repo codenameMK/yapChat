@@ -98,7 +98,7 @@ func main() {
 	//consumer
 	consumerHandler := consumerHandler.ConsumerStruct{
 		BrokerList:  brokerList,
-		GroupId:     "comment-consumer-group",
+		GroupId:     userId,
 		SSLProtocol: protocol,
 		SSLPath:     caCertPath,
 	}

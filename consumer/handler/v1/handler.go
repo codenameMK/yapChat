@@ -9,7 +9,7 @@ import (
 
 type ConsumerStruct struct {
 	BrokerList  string
-	GroupId     string
+	GroupId     int
 	SSLProtocol string
 	SSLPath     string
 }
