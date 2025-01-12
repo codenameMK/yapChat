@@ -14,10 +14,7 @@ type HttpServer struct {
 }
 
 func (s HttpServer) StartServer() {
-	// Channel to capture errors and graceful shutdown signals
-	done := make(chan bool)
 
-	// Start a Goroutine to read messages from the terminal and publish to Kafka
 	go func() {
 		reader := bufio.NewReader(os.Stdin)
 		fmt.Println("Enter messages to publish to the Kafka topic (type 'exit' to quit):")
@@ -49,17 +46,5 @@ func (s HttpServer) StartServer() {
 				log.Printf("Message '%s' queued for delivery\n", text)
 			}
 		}
-
-		// Signal to stop the server
-		done <- true
 	}()
-
-	// Wait for completion or shutdown signal
-	<-done
-
-	// Ensure all messages are delivered before shutting down
-	log.Println("Flushing pending messages...")
-	s.Producer.Flush(15 * 1000)
-
-	log.Println("Server shutting down...")
 }
