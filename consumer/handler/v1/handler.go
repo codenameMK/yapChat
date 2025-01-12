@@ -3,8 +3,11 @@ package v1
 import (
 	"fmt"
 	"log"
+	"os"
+	"strings"
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
+	"golang.org/x/term"
 )
 
 type ConsumerStruct struct {
@@ -39,12 +42,22 @@ func StartConsumer(consumer *kafka.Consumer, topic string) {
 
 	log.Printf("Consuming messages from topic: %s\n", topic)
 
+	// Get the terminal width
+	width, _, err := term.GetSize(int(os.Stdout.Fd()))
+	if err != nil {
+		fmt.Println("Error getting terminal size:", err)
+		width = 80 // Default to 80 if error occurs
+	}
+	// Calculate 80% of the terminal width
+	limitWidth := int(float64(width) * 0.8)
+
 	for {
 		// Read message from Kafka
 		msg, err := consumer.ReadMessage(-1)
 		if err == nil {
 			// Insert the message into PostgreSQL
-			fmt.Println(string(msg.Value))
+			// fmt.Println(string(msg.Value))
+			PrintChatToRight(string(msg.Value), limitWidth)
 			if err != nil {
 				log.Printf("Error inserting message into PostgreSQL: %v\n", err)
 			}
@@ -57,5 +70,40 @@ func StartConsumer(consumer *kafka.Consumer, topic string) {
 			}
 			log.Printf("Error reading message: %v\n", err)
 		}
+	}
+}
+
+
+func PrintChatToRight(msg string, width int) {
+	// Get the terminal width
+	width, _, err := term.GetSize(int(os.Stdout.Fd()))
+	if err != nil {
+		fmt.Println("Error getting terminal size:", err)
+		width = 80 // Default to 80 if error occurs
+	}
+	// Calculate 80% of the terminal width
+	limitWidth := int(float64(width) * 0.8)
+
+	// Split message into lines based on the calculated limit
+	words := strings.Fields(msg)
+	var line string
+	for _, word := range words {
+		// Check if adding the word exceeds the width limit
+		if len(line)+len(word)+1 > limitWidth {
+			// Print the current line and start a new line
+			fmt.Println(line)
+			line = word
+		} else {
+			// Add the word to the current line
+			if len(line) > 0 {
+				line += " "
+			}
+			line += word
+		}
+	}
+
+	// Print the last line if it contains any text
+	if len(line) > 0 {
+		fmt.Println(line)
 	}
 }

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 )
@@ -39,7 +40,6 @@ func StartServer(producer *kafka.Producer, topic *string) {
 
 	for {
 		// Read input from terminal
-		fmt.Print("> ")
 		text, err := reader.ReadString('\n')
 		if err != nil {
 			log.Printf("Error reading input: %v\n", err)
@@ -61,7 +61,7 @@ func StartServer(producer *kafka.Producer, topic *string) {
 		if err != nil {
 			log.Printf("Failed to produce message: %v\n", err)
 		} else {
-			log.Printf("Message '%s' queued for delivery\n", text)
+			log.Printf("\n" , time.Now())
 		}
 	}
 
