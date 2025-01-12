@@ -23,6 +23,7 @@ func (c *KafkaConsumer)Init(){
 		"auto.offset.reset": "latest",
 		"security.protocol": "SSL",
 		"ssl.ca.location":   caCertPath,
+		"debug":             "security,broker,consumer",
 	}
 	consumer, err := kafka.NewConsumer(config)
 	if err != nil {
@@ -31,7 +32,7 @@ func (c *KafkaConsumer)Init(){
 	defer consumer.Close()
 	server := consumerv1.ConsumerHandler{
 		Consumer: consumer,
-		Topic:    "comments",
+		Topic:    topic,
 	}
 	server.StartConsuming()
 
