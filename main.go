@@ -13,4 +13,6 @@ func main() {
 	producerHandlerv1.Init()
 	consumerHandlernow := consuerHandlerv1.KafkaConsumer{UserID: userId}
 	consumerHandlernow.Init()
+
+	select {}
 }

@@ -23,9 +23,6 @@ func (kc *KafkaConsumer) StartConsumer() {
 		log.Fatalf("Failed to subscribe to topic %s: %v\n", kc.Topic, err)
 	}
 
-	// Channel to signal graceful shutdown
-	done := make(chan bool)
-
 	// Start a Goroutine to consume messages
 	go func() {
 		log.Printf("Consuming messages from topic: %s\n", kc.Topic)
@@ -50,18 +47,8 @@ func (kc *KafkaConsumer) StartConsumer() {
 			}
 		}
 
-		// Signal to stop the consumer
-		done <- true
 	}()
 
-	// Wait for shutdown signal
-	<-done
-
-	// Close the consumer to free up resources
-	log.Println("Closing the Kafka consumer...")
-	kc.Consumer.Close()
-
-	log.Println("Consumer shut down gracefully.")
 }
 
 func (kc *KafkaConsumer) insertMessage(message []byte) error {
