@@ -10,18 +10,23 @@ import (
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 )
 
+type KafkaConsumer struct {
+	UserID int
+}
+
+
 const (
 	brokerList = "b-2.mskkafkacluster.gre9l6.c3.kafka.ap-south-1.amazonaws.com:9094,b-1.mskkafkacluster.gre9l6.c3.kafka.ap-south-1.amazonaws.com:9094" // Use port 9094 for TLS
 	topic      = "comments"
-	caCertPath = "producer/resources/AmazonRootCA1.pem" // Replace with the actual path to the CA certificate
-	groupID    = "comment-consumer-group"               // Consumer group ID for Kafka
+	caCertPath = "producer/resources/AmazonRootCA1.pem" // Replace with the actual path to the CA certificate      // Consumer group ID for Kafka
 	insertQuery = "INSERT INTO kafka_messages (message) VALUES ($1)" // Query to insert messages
 	postgreshost = "yapchat-db.c30quw6ambjb.ap-south-1.rds.amazonaws.com"
 	postgresport = 5432
 )
 
 // Init initializes the Kafka consumer with SSL configuration, connects to PostgreSQL, and starts consuming messages
-func Init() {
+func (c *KafkaConsumer) Init() {
+	groupID    :=  c.UserID 
 
 	// Build the PostgreSQL connection string
 	dbConnStr := fmt.Sprintf("postgreshost=%s postgresport=%s user=yourusername password=yourpassword dbname=yourdbname sslmode=disable", postgreshost, postgresport)

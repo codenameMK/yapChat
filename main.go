@@ -11,5 +11,6 @@ func main() {
 	fmt.Print("Enter your user Id: ") 
 	fmt.Scanln(&userId)
 	producerHandlerv1.Init()
-	consuerHandlerv1.Init()
+	consumerHandlernow := consuerHandlerv1.KafkaConsumer{UserID: userId}
+	consumerHandlernow.Init()
 }
