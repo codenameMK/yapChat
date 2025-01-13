@@ -20,19 +20,27 @@ func main() {
 	producerHandler := producerHandler.ProducerStruct{
 		BrokerList:  config.KafkaBrokers,
 		ClientId:    config.KafkaClientId,
-		SSLProtocol: func() string { if config.KafkaSslEnabled { return "SSL" } else { return "" } }(),
-		SSLPath:     func() string { if config.KafkaSslEnabled { return config.KafkaSslCert } else { return "" } }(),
 		Topic:       topic,
+	}
+	// Conditionally add SSL fields only if SSL is enabled
+	if config.KafkaSslEnabled {
+		producerHandler.SSLProtocol = "SSL"
+		producerHandler.SSLPath = config.KafkaSslCert
 	}
 	go producerHandler.Init()
 
-	//consumer
+
+	// Initialize consumerHandler without SSL fields
 	consumerHandler := consumerHandler.ConsumerStruct{
-		BrokerList:  config.KafkaBrokers,
-		GroupId:     userId,
-		SSLProtocol: func() string { if config.KafkaSslEnabled { return "SSL" } else { return "" } }(),
-		SSLPath:     func() string { if config.KafkaSslEnabled { return config.KafkaSslCert } else { return "" } }(),
+		BrokerList: config.KafkaBrokers,
+		GroupId:    userId,
 	}
+	// Conditionally add SSL fields only if SSL is enabled
+	if config.KafkaSslEnabled {
+		consumerHandler.SSLProtocol = "SSL"
+		consumerHandler.SSLPath = config.KafkaSslCert
+	}
+
 	go consumerHandler.Init()
 
 	select {}
