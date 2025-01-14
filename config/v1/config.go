@@ -15,6 +15,11 @@ var (
 	KafkaSslCert          string
 	KafkaTopic            string
 	KafkaClientId         string
+	PostgresHost		  string
+	PostgresPort		  string
+	PostgresUser		  string
+	PostgresPassword	  string
+	PostgresDb			  string
 )
 
 func Init() {
@@ -33,4 +38,9 @@ func Init() {
 	KafkaSslCert = os.Getenv("KAFKA_SSL_CERT")
 	KafkaTopic = os.Getenv("KAFKA_TOPIC")
 	KafkaClientId = os.Getenv("KAFKA_CLIENT_ID")
+	PostgresHost = os.Getenv("POSTGRES_HOST")
+	PostgresPort = os.Getenv("POSTGRES_PORT")
+	PostgresUser = os.Getenv("POSTGRES_USER")
+	PostgresPassword = os.Getenv("POSTGRES_PASSWORD")
+	PostgresDb = os.Getenv("POSTGRES_DB")
 }
