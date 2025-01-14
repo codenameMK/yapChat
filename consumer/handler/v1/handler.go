@@ -23,9 +23,12 @@ func (co *ConsumerStruct) Init() {
 		"bootstrap.servers": co.BrokerList,
 		"group.id":          co.GroupId,
 		"auto.offset.reset": "latest",
-		"security.protocol": "SSL",
-		"ssl.ca.location":   co.SSLPath,
 	}
+	if co.SSLProtocol == "True" {	
+		config.SetKey("security.protocol", "SSL")
+		config.SetKey("ssl.ca.location", co.SSLPath)
+	}
+
 	consumer, err := kafka.NewConsumer(config)
 	if err != nil {
 		log.Fatalf("Failed to create producer: %s", err)

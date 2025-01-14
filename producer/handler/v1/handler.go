@@ -22,8 +22,10 @@ func (po *ProducerStruct) Init() {
 	config := &kafka.ConfigMap{
 		"bootstrap.servers": po.BrokerList,
 		"client.id":         po.ClientId,
-		"security.protocol": po.SSLProtocol,
-		"ssl.ca.location":   po.SSLPath,
+	}
+	if po.SSLProtocol == "True" {	
+		config.SetKey("security.protocol", "SSL")
+		config.SetKey("ssl.ca.location", po.SSLPath)
 	}
 	producer, err := kafka.NewProducer(config)
 	if err != nil {
