@@ -10,11 +10,11 @@ import (
 )
 
 func main() {
-	var userId, senderId int
+	var userId, receiverId int
 	fmt.Print("Enter your user Id: ")
 	fmt.Scanln(&userId)
 	fmt.Print("Enter your sender Id: ")
-	fmt.Scanln(&senderId)
+	fmt.Scanln(&receiverId)
 
 	config.Init()
 
@@ -24,7 +24,7 @@ func main() {
 		ClientId:   config.KafkaClientId,
 		Topic:      topic,
 		UserId:     int32(userId),
-		SenderId:   int32(senderId),
+		ReceiverId:   int32(receiverId),
 	}
 	// Conditionally add SSL fields only if SSL is enabled
 	if config.KafkaSslEnabled {

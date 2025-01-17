@@ -21,7 +21,7 @@ type ProducerStruct struct {
 	SSLPath     string
 	Topic       string
 	UserId      int32
-	SenderId    int32
+	ReceiverId  int32
 }
 
 func (m *MessageStruct) Validate() error {
@@ -32,10 +32,10 @@ func (m *MessageStruct) Validate() error {
 }
 
 type MessageStruct struct {
-	TimeStamp time.Time
-	Message   string
-	UserId    int32
-	SenderId  int32
+	TimeStamp  time.Time
+	Message    string
+	UserId     int32
+	ReceiverId int32
 }
 
 func (po *ProducerStruct) Init() {
@@ -52,10 +52,10 @@ func (po *ProducerStruct) Init() {
 		log.Fatalf("Failed to create producer: %s", err)
 	}
 	defer producer.Close()
-	StartServer(producer, &po.Topic, po.UserId, po.SenderId)
+	StartServer(producer, &po.Topic, po.UserId, po.ReceiverId)
 }
 
-func StartServer(producer *kafka.Producer, topic *string, userId int32, senderId int32) {
+func StartServer(producer *kafka.Producer, topic *string, userId int32, receiverId int32) {
 
 	reader := bufio.NewReader(os.Stdin)
 	fmt.Println("Enter messages to publish to the Kafka topic (type 'exit' to quit):")
@@ -74,10 +74,10 @@ func StartServer(producer *kafka.Producer, topic *string, userId int32, senderId
 			break
 		}
 		message := MessageStruct{
-			TimeStamp: time.Now(),
-			Message:   text,
-			UserId:    userId,   // Replace with actual user ID
-			SenderId:  senderId, // Replace with actual sender ID
+			TimeStamp:  time.Now(),
+			Message:    text,
+			UserId:     userId,     // Replace with actual user ID
+			ReceiverId: receiverId, // Replace with actual sender ID
 		}
 
 		messageBytes, err := json.Marshal(message)
