@@ -24,6 +24,7 @@ func main() {
 		ClientId:   config.KafkaClientId,
 		Topic:      topic,
 		UserId:     int32(userId),
+		SenderId:   int32(senderId),
 	}
 	// Conditionally add SSL fields only if SSL is enabled
 	if config.KafkaSslEnabled {
