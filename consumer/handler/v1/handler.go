@@ -66,7 +66,7 @@ func StartConsumer(consumer *kafka.Consumer, topic string ,userId int32) {
 				log.Printf("Error unmarshalling message: %v\n", err)
 				continue
 			}
-			if userId != recMessage.ReceiverId {
+			if userId != recMessage.UserId {
 			PrintChatToRight(time.Now().Format("2006-01-02 15:04:05"))
 			PrintChatToRight(recMessage.Message)
 			}
