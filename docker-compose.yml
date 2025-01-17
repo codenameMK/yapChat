@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: postgres-container
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: messages
+    ports:
+      - "5432:5432"  # Map the container's port 5432 to the host's port 5432
+    networks:
+      - my_network
+
+networks:
+  my_network:
+    driver: bridge

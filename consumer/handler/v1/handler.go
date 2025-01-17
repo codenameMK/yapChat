@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -10,6 +11,9 @@ import (
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"golang.org/x/term"
+
+	configenv "yap-chat/config/v1"
+	postgres "yap-chat/postgres/v1" 
 )
 
 type ConsumerStruct struct {
@@ -42,12 +46,24 @@ func (co *ConsumerStruct) Init() {
 		log.Fatalf("Failed to create producer: %s", err)
 	}
 	defer consumer.Close()
-	StartConsumer(consumer, "comments" , int32(co.GroupId))
+
+	// define postgres struct
+	postgres := postgres.PostgresStruct{
+		PostgresHost:     configenv.PostgresHost,
+		PostgresPort:     configenv.PostgresPort,
+		PostgresUser:     configenv.PostgresUser,
+		PostgresPassword: configenv.PostgresPassword,
+		PostgresDb:       configenv.PostgresDb,
+	}
+
+	pgdb, err := postgres.Init()
+
+	StartConsumer(consumer, "comments", int32(co.GroupId), pgdb)
 }
 
-func StartConsumer(consumer *kafka.Consumer, topic string ,userId int32) {
+func StartConsumer(consumer *kafka.Consumer, topic string, userId int32, db *sql.DB) {
 	// Subscribe to the Kafka topic
-	
+
 	err := consumer.Subscribe(topic, nil)
 	if err != nil {
 		log.Fatalf("Failed to subscribe to topic %s: %v\n", topic, err)
@@ -67,8 +83,15 @@ func StartConsumer(consumer *kafka.Consumer, topic string ,userId int32) {
 				continue
 			}
 			if userId != recMessage.UserId {
-			PrintChatToRight(time.Now().Format("2006-01-02 15:04:05"))
-			PrintChatToRight(recMessage.Message)
+
+				// Call InsertMessage, using fields directly from recmessage
+				err := postgres.InsertMessage(db, recMessage.ReceiverId, time.Now(), recMessage.Message , recMessage.UserId, recMessage.ReceiverId)
+				if err != nil {
+					log.Fatalf("Error inserting message: %v", err)
+				}
+				
+				PrintChatToRight(time.Now().Format("2006-01-02 15:04:05"))
+				PrintChatToRight(recMessage.Message)
 			}
 		} else {
 			// Check if it's a non-fatal error

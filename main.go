@@ -10,13 +10,13 @@ import (
 )
 
 func main() {
+	config.Init()
+
 	var userId, receiverId int
 	fmt.Print("Enter your user Id: ")
 	fmt.Scanln(&userId)
 	fmt.Print("Enter your sender Id: ")
 	fmt.Scanln(&receiverId)
-
-	config.Init()
 
 	topic := "comments"
 	producerHandler := producerHandler.ProducerStruct{

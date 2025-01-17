@@ -15,11 +15,11 @@ var (
 	KafkaSslCert          string
 	KafkaTopic            string
 	KafkaClientId         string
-	PostgresHost		  string
-	PostgresPort		  string
-	PostgresUser		  string
-	PostgresPassword	  string
-	PostgresDb			  string
+	PostgresHost          string
+	PostgresPort          string
+	PostgresUser          string
+	PostgresPassword      string
+	PostgresDb            string
 )
 
 func Init() {
