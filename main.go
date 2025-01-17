@@ -24,7 +24,7 @@ func main() {
 		ClientId:   config.KafkaClientId,
 		Topic:      topic,
 		UserId:     int32(userId),
-		ReceiverId:   int32(receiverId),
+		ReceiverId: int32(receiverId),
 	}
 	// Conditionally add SSL fields only if SSL is enabled
 	if config.KafkaSslEnabled {
@@ -37,6 +37,7 @@ func main() {
 	consumerHandler := consumerHandler.ConsumerStruct{
 		BrokerList: config.KafkaBrokers,
 		GroupId:    userId,
+		Topic:      topic,
 	}
 	// Conditionally add SSL fields only if SSL is enabled
 	if config.KafkaSslEnabled {
