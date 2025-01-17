@@ -38,7 +38,7 @@ func (c *ConsumerStruct) StartConsumer(userId int32) {
 				log.Printf("Error unmarshalling message: %v\n", err)
 				continue
 			}
-			if userId != recMessage.UserId {
+			if userId != recMessage.UserId && userId == recMessage.ReceiverId {
 				printChatToRight(time.Now().Format("2006-01-02 15:04:05"))
 				printChatToRight(recMessage.Message)
 			}
