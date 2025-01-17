@@ -4,21 +4,19 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
-
-	config "yap-chat/config/v1"
 )
 
 type PostgresStruct struct {
-	Host     string
-	Port     string
-	User     string
-	Password string
-	Db       string
+	PostgresHost     string
+	PostgresPort     string
+	PostgresUser     string
+	PostgresPassword string
+	PostgresDb       string
 }
 
 func (po *PostgresStruct) Init() {
 	// Initialize PostgreSQL connection
-	db, err := sql.Open("postgres", fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", PostgresHost, PostgresPort, PostgresUser, PostgresPassword, PostgresDb))
+	db, err := sql.Open("postgres", fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", po.PostgresHost, po.PostgresPort, po.PostgresUser, po.PostgresPassword, po.PostgresDb))
 	if err != nil {
 		log.Fatalf("Failed to open a connection to PostgreSQL: %v\n", err)
 	}
