@@ -2,6 +2,8 @@ package v1
 
 import (
 	"bufio"
+	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -10,12 +12,29 @@ import (
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 )
 
+const maxMessageSize = 256
+
 type ProducerStruct struct {
 	BrokerList  string
 	ClientId    string
 	SSLProtocol string
 	SSLPath     string
 	Topic       string
+	UserId      int32
+}
+
+func (m *MessageStruct) Validate() error {
+	if len(m.Message) > maxMessageSize {
+		return errors.New("message exceeds maximum allowed size")
+	}
+	return nil
+}
+
+type MessageStruct struct {
+	TimeStamp time.Time
+	Message   string
+	UserId    int32
+	SenderId  int32
 }
 
 func (po *ProducerStruct) Init() {
@@ -23,7 +42,7 @@ func (po *ProducerStruct) Init() {
 		"bootstrap.servers": po.BrokerList,
 		"client.id":         po.ClientId,
 	}
-	if po.SSLProtocol == "True" {	
+	if po.SSLProtocol == "True" {
 		config.SetKey("security.protocol", "SSL")
 		config.SetKey("ssl.ca.location", po.SSLPath)
 	}
@@ -32,10 +51,10 @@ func (po *ProducerStruct) Init() {
 		log.Fatalf("Failed to create producer: %s", err)
 	}
 	defer producer.Close()
-	StartServer(producer, &po.Topic)
+	StartServer(producer, &po.Topic, po.UserId)
 }
 
-func StartServer(producer *kafka.Producer, topic *string) {
+func StartServer(producer *kafka.Producer, topic *string, userId int32) {
 
 	reader := bufio.NewReader(os.Stdin)
 	fmt.Println("Enter messages to publish to the Kafka topic (type 'exit' to quit):")
@@ -53,11 +72,23 @@ func StartServer(producer *kafka.Producer, topic *string) {
 		if text == "exit" {
 			break
 		}
+		message := MessageStruct{
+			TimeStamp: time.Now(),
+			Message:   text,
+			UserId:    userId, // Replace with actual user ID
+			SenderId:  456,    // Replace with actual sender ID
+		}
+
+		messageBytes, err := json.Marshal(message)
+		if err != nil {
+			log.Printf("Failed to marshal message to JSON: %v\n", err)
+			continue
+		}
 
 		// Produce the message to the Kafka topic
 		err = producer.Produce(&kafka.Message{
 			TopicPartition: kafka.TopicPartition{Topic: topic, Partition: kafka.PartitionAny},
-			Value:          []byte(text),
+			Value:          messageBytes,
 		}, nil)
 
 		if err != nil {

@@ -10,17 +10,20 @@ import (
 )
 
 func main() {
-	var userId int
+	var userId, senderId int
 	fmt.Print("Enter your user Id: ")
 	fmt.Scanln(&userId)
+	fmt.Print("Enter your sender Id: ")
+	fmt.Scanln(&senderId)
 
 	config.Init()
 
 	topic := "comments"
 	producerHandler := producerHandler.ProducerStruct{
-		BrokerList:  config.KafkaBrokers,
-		ClientId:    config.KafkaClientId,
-		Topic:       topic,
+		BrokerList: config.KafkaBrokers,
+		ClientId:   config.KafkaClientId,
+		Topic:      topic,
+		UserId:     int32(userId),
 	}
 	// Conditionally add SSL fields only if SSL is enabled
 	if config.KafkaSslEnabled {
@@ -28,7 +31,6 @@ func main() {
 		producerHandler.SSLPath = config.KafkaSslCert
 	}
 	go producerHandler.Init()
-
 
 	// Initialize consumerHandler without SSL fields
 	consumerHandler := consumerHandler.ConsumerStruct{
