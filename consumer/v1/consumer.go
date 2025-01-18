@@ -7,7 +7,11 @@ import (
 	"os"
 	"strings"
 	"time"
+	"database/sql"
 	_model "yap-chat/consumer/models/v1"
+	postgresdb "yap-chat/postgres/v1"
+	configenv "yap-chat/config/v1"
+
 	"golang.org/x/term"
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 )
@@ -15,6 +19,7 @@ import (
 type ConsumerStruct struct {
 	Consumer *kafka.Consumer
 	Topic    string
+	pgdb	 *sql.DB
 }
 
 func (c *ConsumerStruct) StartConsumer(userId int32) {
@@ -26,6 +31,16 @@ func (c *ConsumerStruct) StartConsumer(userId int32) {
 	}
 
 	log.Printf("Consuming messages from topic: %s\n", c.Topic)
+
+	postgres := postgresdb.PostgresStruct{
+		PostgresHost:     configenv.PostgresHost,
+		PostgresPort:     configenv.PostgresPort,
+		PostgresUser:     configenv.PostgresUser,
+		PostgresPassword: configenv.PostgresPassword,
+		PostgresDb:       configenv.PostgresDb,
+	}
+
+	pgdb, err := postgres.Init()
 
 	for {
 		var recMessage _model.MessageStruct
@@ -39,6 +54,11 @@ func (c *ConsumerStruct) StartConsumer(userId int32) {
 				continue
 			}
 			if userId != recMessage.UserId && userId == recMessage.ReceiverId {
+				err := postgresdb.InsertMessage(pgdb, recMessage.ReceiverId, time.Now(), recMessage.Message , recMessage.UserId, recMessage.ReceiverId)
+				if err != nil {
+					log.Fatalf("Error inserting message: %v", err)
+				}
+				
 				printChatToRight(time.Now().Format("2006-01-02 15:04:05"))
 				printChatToRight(recMessage.Message)
 			}
